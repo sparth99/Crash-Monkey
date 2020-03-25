@@ -2,14 +2,19 @@ import docker
 import datetime
 import json
 
-def execute_stres_test(container_name):
+tests= ['stress --cpu 3 --hdd 5 --timeout 300s',
+        'stress --cpu 4 --timeout 400s',
+        'stress --vm 4 --timeout 400s',
+        'stress --hdd 5 --timeout 400s']
+
+def execute_stres_test(container_name,stress_test):
     test_type = "CPU"
     start_time = datetime.datetime.utcnow()
     client = docker.from_env()
     # container_name = 'competent_proskuriakova'
     container = client.containers.get(container_name)
     try:
-        m = container.exec_run("stress --cpu 1 --timeout 60s",detach=True)
+        m = container.exec_run(tests[stress_test],detach=True)
     except Exception as e:
         print(e)
     # run the application
@@ -39,7 +44,7 @@ def write_container_logs(logs,name):
             the_file.write(str(log))
 
 if __name__ == "__main__":
-    execute_stres_test('competent_proskuriakova')
+    execute_stres_test('eloquent_nobel',0)
 
 # docker run -it --memory="256m" --cpus=".1" chaos 
 # docker exec -it competent_proskuriakova /bin/bash
