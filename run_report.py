@@ -11,14 +11,13 @@ def execute_stres_test(container_name,stress_test):
     test_type = "CPU"
     start_time = datetime.datetime.utcnow()
     client = docker.from_env()
-    # container_name = 'competent_proskuriakova'
     container = client.containers.get(container_name)
     try:
         m = container.exec_run(tests[stress_test],detach=True)
     except Exception as e:
         print(e)
     # run the application
-    m = container.exec_run('python tests.py')
+    m = container.exec_run('python app.py &')
     end_time = datetime.datetime.utcnow()
     report = generate_json_report(start_time,end_time,test_type)
     write_report_to_file(report)
@@ -44,7 +43,8 @@ def write_container_logs(logs,name):
             the_file.write(str(log))
 
 if __name__ == "__main__":
-    execute_stres_test('eloquent_nobel',0)
+    execute_stres_test('lucid_turing',0)
 
 # docker run -it --memory="256m" --cpus=".1" chaos 
 # docker exec -it competent_proskuriakova /bin/bash
+# docker run -it chaos 

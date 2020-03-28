@@ -21,10 +21,6 @@ RUN pip install SQLAlchemy
 RUN pip install pymysql
 RUN pip install flask_cors
 
-
-ENV TZ=America/Chicago
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
 WORKDIR /src
 
 CMD bash
