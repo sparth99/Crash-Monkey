@@ -5,4 +5,5 @@ class Logs(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     date = db.Column(db.String(), nullable=False, unique=False)
     text = db.Column(db.String(), nullable=False, unique=False)
+    container = db.Column(db.String(), nullable=False, unique=False)
 
