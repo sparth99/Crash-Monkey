@@ -2,7 +2,7 @@ import docker
 import datetime
 import json
 
-tests= ['stress --cpu 3 --hdd 5 --timeout 300s',
+tests= ['stress --cpu 3 --hdd 5 --timeout 120s',
         'stress --cpu 4 --timeout 400s',
         'stress --vm 4 --timeout 400s',
         'stress --hdd 5 --timeout 400s']
@@ -17,7 +17,7 @@ def execute_stres_test(container_name,stress_test):
     except Exception as e:
         print(e)
     # run the application
-    m = container.exec_run('python app.py &')
+    m = container.exec_run('timeout 120 python app.py')
     end_time = datetime.datetime.utcnow()
     report = generate_json_report(start_time,end_time,test_type)
     write_report_to_file(report)
@@ -43,8 +43,8 @@ def write_container_logs(logs,name):
             the_file.write(str(log))
 
 if __name__ == "__main__":
-    execute_stres_test('lucid_turing',0)
+    execute_stres_test('eloquent_shtern',0)
 
-# docker run -it --memory="256m" --cpus=".1" chaos 
+# docker run -it --memory="256m" --cpus=".1" -p 8080:5000 chaos 
 # docker exec -it competent_proskuriakova /bin/bash
 # docker run -it chaos 

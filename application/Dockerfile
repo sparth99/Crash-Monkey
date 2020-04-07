@@ -21,6 +21,8 @@ RUN pip install SQLAlchemy
 RUN pip install pymysql
 RUN pip install flask_cors
 
+EXPOSE 5000
+
 WORKDIR /src
 
 CMD bash
