@@ -2,6 +2,10 @@ import docker
 import datetime
 import json
 
+import sys
+sys.path.append('../backend/models/')
+from models import db, Jobs
+
 tests= ['stress --cpu 3 --hdd 5 --timeout 120s',
         'stress --cpu 4 --timeout 400s',
         'stress --vm 4 --timeout 400s',
@@ -22,7 +26,6 @@ def execute_stres_test(container_name,stress_test):
     report = generate_json_report(start_time,end_time,test_type)
     write_report_to_file(report)
     logs = container.logs(timestamps=True)
-    logs = logs.decode().split("\n")
     write_container_logs(logs,container_name)
 
 def generate_json_report(start_time, end_time, test):
@@ -30,6 +33,14 @@ def generate_json_report(start_time, end_time, test):
     report['start_time'] = str(start_time)
     report['end_time'] = str(end_time)
     report['test'] = test
+    db.session.add(
+        Jobs(
+            start_time = str(start_time),
+            end_time = str(end_time),
+            stress_test = str(test),
+        )
+    )
+    db.session.commit()
     json_report = json.dumps(report)
     return json_report
 
@@ -43,8 +54,8 @@ def write_container_logs(logs,name):
             the_file.write(str(log))
 
 if __name__ == "__main__":
-    execute_stres_test('eloquent_shtern',0)
+    execute_stres_test('great_hamilton',0)
 
-# docker run -it --memory="256m" --cpus=".1" -p 8080:5000 chaos 
+# docker run -it -p 8080:5000 chaos 
 # docker exec -it competent_proskuriakova /bin/bash
 # docker run -it chaos 
