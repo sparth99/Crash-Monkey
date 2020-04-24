@@ -4,12 +4,14 @@ import json
 
 import sys
 sys.path.append('../backend/models/')
-from models import db, Jobs
+from models import db, Jobs, Logs
 
-tests= ['stress --cpu 3 --hdd 5 --timeout 120s',
+tests= [
+        'stress --cpu 3 --hdd 5 --timeout 60s',
         'stress --cpu 4 --timeout 400s',
         'stress --vm 4 --timeout 400s',
-        'stress --hdd 5 --timeout 400s']
+        'stress --hdd 5 --timeout 400s'
+        ]
 
 def execute_stres_test(container_name,stress_test):
     test_type = "CPU"
@@ -21,11 +23,12 @@ def execute_stres_test(container_name,stress_test):
     except Exception as e:
         print(e)
     # run the application
-    m = container.exec_run('timeout 120 python app.py')
+    m = container.exec_run('timeout 60 python app.py')
     end_time = datetime.datetime.utcnow()
     report = generate_json_report(start_time,end_time,test_type)
     write_report_to_file(report)
     logs = container.logs(timestamps=True)
+    logs = logs.decode().split("\n")
     write_container_logs(logs,container_name)
 
 def generate_json_report(start_time, end_time, test):
@@ -51,10 +54,19 @@ def write_report_to_file(report):
 def write_container_logs(logs,name):
     with open('external-log/containers-' + name + '.log','a') as the_file:
         for log in logs:
+            log = log.split(" ")
+            db.session.add(
+                Logs(
+                    date=log[0],
+                    text=' '.join(log[1:]),
+                    container=name,
+                )
+            )
+            db.session.commit()
             the_file.write(str(log))
 
 if __name__ == "__main__":
-    execute_stres_test('great_hamilton',0)
+    execute_stres_test('epic_meninsky',0)
 
 # docker run -it -p 8080:5000 chaos 
 # docker exec -it competent_proskuriakova /bin/bash
